@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quake 2 Server Browser</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="main.js" defer></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <header class="sidebar-header">
+        <div class="app-logo">
+          <img src="assets/logo.png" alt="Logo" width="24" height="24" class="app-logo-img">
+          <h1>Q2 Browser</h1>
+        </div>
+        <button id="settings-btn" class="icon-btn" title="设置">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </header>
+
+      <div class="sidebar-actions">
+        <button id="add-server-btn" class="primary-btn">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          添加服务器
+        </button>
+      </div>
+
+      <div id="server-list" class="server-list scrollbar">
+        <!-- Servers will be dynamically loaded here -->
+        <div class="list-empty-state">
+          <p>暂无服务器</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Empty State -->
+      <section id="empty-details" class="details-empty-state">
+        <div class="empty-icon-wrapper">
+          <svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+          </svg>
+        </div>
+        <h2>Quake 2 服务器浏览器</h2>
+        <p>在左侧选择一个服务器以查看详细状态和在线玩家列表，或点击“添加服务器”按钮新增监控。</p>
+      </section>
+
+      <!-- Server Details View -->
+      <section id="server-details" class="server-details hidden">
+        <header class="details-header">
+          <div class="details-header-left">
+            <button id="back-to-list-btn" class="icon-btn mobile-only-btn" title="返回列表" onclick="goBackToList()">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+            </button>
+            <div class="server-title-area">
+              <h2 id="detail-server-name">服务器名称</h2>
+            </div>
+          </div>
+          <div class="server-meta-tags">
+            <span id="detail-server-addr" class="tag address-tag">127.0.0.1:27910</span>
+            <span id="detail-server-map" class="tag map-tag">地图: -</span>
+            <span id="detail-server-players-count" class="tag players-tag">玩家: -</span>
+            <span id="detail-server-ping" class="tag ping-tag">延迟: -</span>
+          </div>
+          <div class="details-actions">
+            <button id="refresh-btn" class="action-btn" title="手动刷新">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+              </svg>
+              刷新
+            </button>
+            <button id="delete-btn" class="danger-btn" title="删除服务器">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              删除
+            </button>
+          </div>
+        </header>
+
+        <!-- Player List Section -->
+        <div class="players-section">
+          <h3>在线玩家列表</h3>
+          <div class="table-container scrollbar">
+            <table class="players-table">
+              <thead>
+                <tr>
+                  <th>玩家名称</th>
+                  <th>积分 (Score)</th>
+                  <th>延迟 (Ping)</th>
+                </tr>
+              </thead>
+              <tbody id="players-list-body">
+                <!-- Players loaded dynamically -->
+                <tr>
+                  <td colspan="3" class="table-empty">暂无玩家在线</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Status Bar -->
+  <footer class="status-bar">
+    <span id="status-text">就绪</span>
+  </footer>
+
+  <!-- Add Server Modal -->
+  <div id="add-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3>添加服务器</h3>
+        <button id="close-add-modal" class="close-btn">&times;</button>
+      </header>
+      <form id="add-server-form" class="modal-form">
+        <div class="form-group">
+          <label for="server-name-input">服务器名称</label>
+          <input type="text" id="server-name-input" placeholder="例如: My Quake 2 Server" required>
+        </div>
+        <div class="form-group">
+          <label for="server-addr-input">服务器地址 (IP:端口)</label>
+          <input type="text" id="server-addr-input" placeholder="例如: 192.168.1.100:27910" required>
+          <small class="form-help">端口可选，默认端口为 27910</small>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="cancel-add-btn" class="secondary-btn">取消</button>
+          <button type="submit" class="primary-btn">添加</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3>应用设置</h3>
+        <button id="close-settings-modal" class="close-btn">&times;</button>
+      </header>
+      <form id="settings-form" class="modal-form">
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="minimize-startup-input">
+          <label for="minimize-startup-input">启动时最小化到系统托盘</label>
+        </div>
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="close-tray-input">
+          <label for="close-tray-input">点击关闭按钮时最小化到系统托盘</label>
+        </div>
+        <div class="form-group separator"></div>
+        <div class="form-group">
+          <label>自动刷新频率</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="refresh-interval" value="0"> 禁用
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="refresh-interval" value="5"> 5秒
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="refresh-interval" value="30"> 30秒
+            </label>
+          </div>
+        </div>
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="disable-notify-input">
+          <label for="disable-notify-input">禁用玩家上线系统通知</label>
+          <small class="form-help block-help">（仅在启用自动刷新时有效）</small>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="cancel-settings-btn" class="secondary-btn">取消</button>
+          <button type="submit" class="primary-btn">保存设置</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

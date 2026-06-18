@@ -80,3 +80,10 @@ upx --best --lzma src-tauri/target/release/q2-server-browser-tauri.exe
 *   **现代暗黑美学**：使用深邃的太空蓝黑色系作为背景，搭配霓虹紫（Indigo）和翡翠绿（Emerald）等高对比度状态指示器。
 *   **毛玻璃特效**：弹窗和侧边栏采用半透明高模糊的背景模糊滤镜（Glassmorphism），显得极具高级感。
 *   **响应式侧边栏**：左侧为服务器导航卡片（实时显示状态、地图和 Ping 颜色），右侧为详情及在线玩家表格，清晰直观。
+
+---
+
+## 📄 许可证
+
+本项目基于 [GNU Affero General Public License v3.0 (AGPL-3.0)](LICENSE) 协议开源。
+
